@@ -1,0 +1,692 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<title>¡Atrapa los corazones!</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+  body {
+  margin: 0;
+  min-height: 100dvh;
+  background: #252238;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  font-family: monospace;
+  touch-action: none;
+  color: #713d65;
+}
+
+.screen {
+  width: min(100vw, 56.25dvh);
+  aspect-ratio: 9 / 16;
+  background: #f8cce0;
+  border: 4px solid #fff0f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  text-align: center;
+}
+  .hidden {
+  display: none !important;
+}
+
+h1 {
+  font-size: clamp(20px, 6vw, 28px);
+  color: #a84f82;
+  text-shadow: 2px 2px #fff;
+  line-height: 1.5;
+}
+
+.subtitle {
+  font-size: 10px;
+  margin-bottom: 25px;
+}
+
+button {
+  font-family: monospace;
+  font-weight: bold;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.pixel-button {
+  border: 3px solid #713d65;
+  background: #ffe4ef;
+  color: #713d65;
+  padding: 13px 25px;
+  box-shadow: 4px 4px 0 #713d65;
+  font-size: 13px;
+    }
+  .pixel-button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 #713d65;
+}
+
+.characters {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+.character-button {
+  width: 48%;
+  padding: 8px 4px;
+  border: 3px solid #713d65;
+  background: #ffe4ef;
+  box-shadow: 4px 4px 0 #713d65;
+  color: #713d65;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.character-button img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.character-button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 #713d65;
+}
+  #game {
+  width: min(100vw, 56.25dvh);
+  height: auto;
+  aspect-ratio: 9 / 16;
+  border: 4px solid #fff0f5;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOADING -->
+<section id="loading" class="screen">
+  <h1>¡Atrapa los corazones!</h1>
+  <p class="subtitle">Cargando tu mundo...</p>
+  <p>♥ ♥ ♥</p>
+</section>
+
+<!-- TITLE -->
+<section id="title" class="screen hidden">
+  <h1>¡Atrapa los corazones!</h1>
+  <p class="subtitle">Hecho para mi novio lindo ♡</p>
+  <p style="font-size:30px">♥ ♡ ♥</p>
+  <button class="pixel-button" id="start">START</button>
+  <p class="subtitle" style="margin-top:35px">
+    Te amo! Disfrútalo
+  </p>
+</section>
+
+<!-- CHARACTER SELECTION -->
+<section id="selection" class="screen hidden">
+  <h1>ESCOGE TU PERSONAJE</h1>
+  <p class="subtitle">Como quién jugarás?</p>
+
+  <div class="characters">
+
+    <button class="character-button" data-character="haru">
+      <img src="assets/haru.png" alt="Haru">
+      <span>HARU</span>
+      <small>ESCOGER</small>
+    </button>
+
+    <button class="character-button" data-character="teo">
+      <img src="assets/teo.png" alt="Teo">
+      <span>TEO</span>
+      <small>ESCOGER</small>
+    </button>
+
+  </div>
+
+  <p class="subtitle" style="margin-top:30px">
+    Escoge a tu MVP
+  </p>
+</section>
+
+<!-- VICTORY -->
+<section id="victory" class="screen hidden">
+  <h1>OMG??? GANASTE!!</h1>
+  <p style="font-size:35px">♥ ♡ ♥</p>
+  <p>Atrapaste todos los corazones, putito</p>
+  <p>Estoy orgulloso de ti!</p>
+
+  <h2 style="color:#a84f82">
+    PUNTOS: <span id="winScore">2000</span>
+  </h2>
+
+  <p class="subtitle">Una victoria más para mi persona favorita!</p>
+
+  <button class="pixel-button" id="playAgainWin">¡DE NUEVOO!</button>
+
+  <button class="pixel-button" id="menuWin" style="margin-top:15px">
+    MENU PRINCIPAL
+  </button>
+</section>
+
+<!-- GAME OVER -->
+<section id="gameOver" class="screen hidden">
+  <h1>Ops...</h1>
+  <p style="font-size:35px">♡ 💔 ♡</p>
+  <p>No te rindas!</p>
+
+  <h2 style="color:#a84f82">
+    PUNTOS: <span id="loseScore">0</span>
+  </h2>
+
+  <p class="subtitle">Te dejaré intentar de nuevo ♡</p>
+
+  <button class="pixel-button" id="playAgainLose">DE NUEVO</button>
+
+  <button class="pixel-button" id="menuLose" style="margin-top:15px">
+    MENU PRINCIPAL
+  </button>
+</section>
+
+<!-- BIRTHDAY SECRET -->
+<section id="birthday" class="screen hidden">
+  <h1>FELIZ CUMPLE BEBE!</h1>
+  <p style="font-size:42px">🎂</p>
+  <h2 style="color:#a84f82">Holi Teo</h2>
+  <p>Encontraste el pastel secreto >< ♡</p>
+  <p>Este minijuego existe porque quería regalarte algo hecho por mí.</p>
+  <p>Gracias siempre por ser parte de mi vida.</p>
+  <p style="font-size:24px">♥ ♥ ♥</p>
+
+  <button class="pixel-button" id="birthdayMenu">
+    VOLVER AL MENÚ
+  </button>
+</section>
+
+<!-- GAMEPLAY -->
+<canvas id="game" width="180" height="320" class="hidden"></canvas>
+
+<script>
+
+// ----------------------------
+// ASSETS
+// ----------------------------
+
+const assets = {};
+
+  
+// ----------------------------
+// AUDIO
+// ----------------------------
+
+const sounds = {
+  mainTheme: new Audio("assets/sounds/main-theme.mp3"),
+  button: new Audio("assets/sounds/button.mp3"),
+  cake: new Audio("assets/sounds/cake-surprise.mp3"),
+  gameOver: new Audio("assets/sounds/game-over.mp3"),
+  heart: new Audio("assets/sounds/heart.mp3"),
+  poop: new Audio("assets/sounds/poop.mp3"),
+  victory: new Audio("assets/sounds/victory.mp3")
+};
+
+sounds.mainTheme.loop = true;
+sounds.mainTheme.volume = 0.35;
+
+function playSound(name) {
+  const sound = sounds[name];
+
+  if (!sound) return;
+
+  sound.currentTime = 0;
+  sound.play().catch(error => {
+    console.log("No se pudo reproducir el sonido:", error);
+  });
+}
+
+function stopMusic() {
+  sounds.mainTheme.pause();
+  sounds.mainTheme.currentTime = 0;
+}
+
+
+const files = [
+  "haru",
+  "teo",
+  "heart",
+  "poop",
+  "cake",
+  "background"
+];
+
+files.forEach(name => {
+  const img = new Image();
+  img.src = `assets/${name}.png`;
+  assets[name] = img;
+});
+
+  document.querySelectorAll("button").forEach(button => {
+  button.addEventListener("click", () => {
+    playSound("button");
+  });
+});
+
+// ----------------------------
+// SCREENS
+// ----------------------------
+
+const loading = document.getElementById("loading");
+const title = document.getElementById("title");
+const selection = document.getElementById("selection");
+const canvas = document.getElementById("game");
+
+const ctx = canvas.getContext("2d");
+
+function showScreen(screen) {
+
+  loading.classList.add("hidden");
+  title.classList.add("hidden");
+  selection.classList.add("hidden");
+  canvas.classList.add("hidden");
+
+  document.getElementById("victory").classList.add("hidden");
+  document.getElementById("gameOver").classList.add("hidden");
+  document.getElementById("birthday").classList.add("hidden");
+
+  screen.classList.remove("hidden");
+
+}
+
+  // LOADING
+
+setTimeout(() => {
+  showScreen(title);
+}, 3000);
+
+// ----------------------------
+// MENU
+// ----------------------------
+
+document.getElementById("start").addEventListener("click", () => {
+  sounds.mainTheme.currentTime = 0;
+  sounds.mainTheme.play().catch(() => {});
+  showScreen(selection);
+});
+
+let selectedCharacter = null;
+
+document.querySelectorAll(".character-button").forEach(button => {
+
+  button.addEventListener("click", () => {
+
+    selectedCharacter = button.dataset.character;
+
+    startGame();
+
+  });
+
+});
+
+// ----------------------------
+// GAME VARIABLES
+// ----------------------------
+
+let score = 0;
+let lives = 3;
+let objects = [];
+let frame = 0;
+let gameActive = false;
+let cakeAvailable = false;
+
+const player = {
+  x: 90,
+  y: 270,
+  width: 48,
+  height: 48,
+  dragging: false
+};
+
+// ----------------------------
+// START GAME
+// ----------------------------
+
+function startGame() {
+
+  stopMusic();
+sounds.mainTheme.play().catch(() => {});
+
+  score = 0;
+  lives = 3;
+  objects = [];
+  frame = 0;
+  cakeAvailable = false;
+
+  player.x = 90;
+  player.dragging = false;
+
+  gameActive = true;
+
+  showScreen(canvas);
+
+  draw();
+
+}
+  // ----------------------------
+// SPAWN OBJECTS
+// ----------------------------
+
+function spawnObject() {
+
+  const isPoop = Math.random() < 0.25;
+
+  objects.push({
+    type: isPoop ? "poop" : "heart",
+    x: 12 + Math.random() * 156,
+    y: -16,
+    size: 16,
+    speed: 1.2 + Math.random() * 1.2
+  });
+
+}
+
+// ----------------------------
+// COLLISIONS
+// ----------------------------
+
+function checkCollision(obj) {
+
+  const px = player.x - player.width / 2;
+  const py = player.y - player.height / 2;
+
+  return (
+    obj.x + obj.size / 2 > px &&
+    obj.x - obj.size / 2 < px + player.width &&
+    obj.y + obj.size / 2 > py &&
+    obj.y - obj.size / 2 < py + player.height
+  );
+
+}
+
+// ----------------------------
+// DRAW GAME
+// ----------------------------
+
+function draw() {
+
+  if (!gameActive || canvas.classList.contains("hidden")) return;
+
+  ctx.imageSmoothingEnabled = false;
+
+  // BACKGROUND
+
+  if (assets.background.complete && assets.background.naturalWidth) {
+
+    ctx.drawImage(assets.background, 0, 0, 180, 320);
+
+  } else {
+
+    ctx.fillStyle = "#f8cce0";
+    ctx.fillRect(0, 0, 180, 320);
+
+  }
+  // FRAME COUNTER
+
+  frame++;
+
+  // NORMAL OBJECTS
+
+  if (frame % 55 === 0) {
+    spawnObject();
+  }
+
+  // SECRET CAKE
+  // After 20 seconds, 4% chance every second.
+
+  if (
+    frame >= 1200 &&
+    frame % 60 === 0 &&
+    !cakeAvailable &&
+    Math.random() < 1
+  ) {
+
+    objects.push({
+      type: "cake",
+      x: 20 + Math.random() * 140,
+      y: -20,
+      size: 32,
+      speed: 1.4
+    });
+
+    cakeAvailable = true;
+
+  }
+  
+// MOVE AND DRAW OBJECTS
+
+  for (let i = objects.length - 1; i >= 0; i--) {
+
+    const obj = objects[i];
+
+    obj.y += obj.speed;
+
+    const sprite = assets[obj.type];
+
+    if (sprite && sprite.complete && sprite.naturalWidth) {
+
+      ctx.drawImage(
+        sprite,
+        obj.x - obj.size / 2,
+        obj.y - obj.size / 2,
+        obj.size,
+        obj.size
+      );
+
+    }
+
+    // COLLISION
+
+    if (checkCollision(obj)) {
+
+      if (obj.type === "heart") {
+        score += 100;
+        playSound("heart");
+      }
+
+      if (obj.type === "poop") {
+        lives--;
+        playSound("poop");
+      }
+
+      if (obj.type === "cake") {
+
+  gameActive = false;
+
+  stopMusic();
+  playSound("cake");
+  showScreen(document.getElementById("birthday"));
+
+  return;
+
+      }
+
+      objects.splice(i, 1);
+
+      continue;
+
+      }
+    // REMOVE OBJECTS OUTSIDE SCREEN
+
+    if (obj.y > 335) {
+      objects.splice(i, 1);
+    }
+
+  }
+
+  // VICTORY
+
+  if (score >= 2000) {
+
+    gameActive = false;
+
+    stopMusic();
+playSound("victory");
+
+    document.getElementById("winScore").textContent = score;
+
+    showScreen(document.getElementById("victory"));
+
+    return;
+
+  }
+
+  // GAME OVER
+
+  if (lives <= 0) {
+
+    gameActive = false;
+
+    stopMusic();
+playSound("gameOver");
+
+    document.getElementById("loseScore").textContent = score;
+
+    showScreen(document.getElementById("gameOver"));
+
+    return;
+
+  }
+
+    // CHARACTER
+
+  const character = assets[selectedCharacter];
+
+  if (character && character.complete && character.naturalWidth) {
+
+    ctx.drawImage(
+      character,
+      player.x - player.width / 2,
+      player.y - player.height / 2,
+      player.width,
+      player.height
+    );
+
+  }
+
+  // HUD
+
+  ctx.fillStyle = "#713d65";
+  ctx.font = "bold 10px monospace";
+  ctx.textBaseline = "top";
+
+  ctx.fillText("PUNTOS: " + score, 5, 5);
+  ctx.fillText("♥".repeat(lives), 140, 5);
+
+  requestAnimationFrame(draw);
+
+  }
+  // ----------------------------
+// END SCREEN BUTTONS
+// ----------------------------
+
+document.getElementById("playAgainWin").addEventListener("click", startGame);
+
+document.getElementById("playAgainLose").addEventListener("click", startGame);
+
+document.getElementById("menuWin").addEventListener("click", () => {
+  gameActive = false;
+  showScreen(title);
+});
+
+document.getElementById("menuLose").addEventListener("click", () => {
+  gameActive = false;
+  showScreen(title);
+});
+
+document.getElementById("birthdayMenu").addEventListener("click", () => {
+  gameActive = false;
+  showScreen(title);
+});
+
+// ----------------------------
+// TOUCH & DRAG
+// ----------------------------
+
+canvas.addEventListener("pointerdown", e => {
+
+  const rect = canvas.getBoundingClientRect();
+
+  const x = (e.clientX - rect.left) * canvas.width / rect.width;
+  const y = (e.clientY - rect.top) * canvas.height / rect.height;
+
+  if (
+    x >= player.x - player.width / 2 &&
+    x <= player.x + player.width / 2 &&
+    y >= player.y - player.height / 2 &&
+    y <= player.y + player.height / 2
+  ) {
+
+    player.dragging = true;
+    canvas.setPointerCapture(e.pointerId);
+
+  }
+
+});
+
+canvas.addEventListener("pointermove", e => {
+
+  if (!player.dragging) return;
+
+  const rect = canvas.getBoundingClientRect();
+
+  player.x = (e.clientX - rect.left) * canvas.width / rect.width;
+
+  player.x = Math.max(
+    player.width / 2,
+    Math.min(180 - player.width / 2, player.x)
+  );
+
+});
+
+canvas.addEventListener("pointerup", () => {
+  player.dragging = false;
+});
+
+canvas.addEventListener("pointercancel", () => {
+  player.dragging = false;
+});
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
